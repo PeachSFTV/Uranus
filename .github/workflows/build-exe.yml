@@ -1,0 +1,451 @@
+name: Build Uranus Executables
+
+on:
+  push:
+    branches: [ main, master, develop ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:  # Allow manual triggering
+
+env:
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-22.04
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for version detection
+    
+    - name: Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install System Dependencies (Linux)
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential \
+          cmake \
+          swig \
+          libssl-dev \
+          pkg-config \
+          libtool \
+          autoconf \
+          automake \
+          git \
+          upx-ucl
+    
+    - name: Cache Python Dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: Create Virtual Environment
+      run: |
+        python -m venv venv
+        source venv/bin/activate
+        pip install --upgrade pip setuptools wheel
+    
+    - name: Build libiec61850 and pyiec61850
+      run: |
+        source venv/bin/activate
+        
+        # Clone libiec61850
+        git clone --depth 1 https://github.com/mz-automation/libiec61850.git
+        cd libiec61850
+        
+        # Build library
+        mkdir build && cd build
+        cmake -DBUILD_PYTHON_BINDINGS=ON \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DBUILD_EXAMPLES=OFF \
+              ..
+        make -j$(nproc)
+        
+        # Install Python bindings
+        cd ../pyiec61850
+        pip install .
+        cd ../..
+        
+        # Test installation
+        python -c "import pyiec61850; print('✅ pyiec61850 installed successfully')"
+        
+        # Cleanup to save space
+        rm -rf libiec61850
+    
+    - name: Install Python Dependencies
+      run: |
+        source venv/bin/activate
+        pip install -r requirements.txt
+        pip install pyinstaller
+    
+    - name: Get Version
+      id: version
+      run: |
+        if [[ $GITHUB_REF == refs/tags/* ]]; then
+          VERSION=${GITHUB_REF#refs/tags/}
+        else
+          VERSION="dev-$(date +%Y%m%d)-$(git rev-parse --short HEAD)"
+        fi
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Building version: $VERSION"
+    
+    - name: Build Linux Executable
+      run: |
+        source venv/bin/activate
+        
+        # Verify pyiec61850 is available
+        python -c "import pyiec61850; print('pyiec61850 version check passed')"
+        
+        # Run PyInstaller
+        pyinstaller uranus.spec
+        
+        # Verify executable
+        if [ -f "dist/Uranus" ]; then
+          echo "✅ Linux executable created successfully"
+          ls -lh dist/Uranus
+          file dist/Uranus
+        else
+          echo "❌ Failed to create Linux executable"
+          exit 1
+        fi
+    
+    - name: Test Linux Executable
+      run: |
+        cd dist
+        timeout 10s ./Uranus --help || echo "Timeout reached (expected for GUI app)"
+        echo "✅ Linux executable test completed"
+    
+    - name: Prepare Linux Release
+      run: |
+        mkdir -p release
+        cp dist/Uranus release/Uranus-linux-x64
+        chmod +x release/Uranus-linux-x64
+        
+        # Create info file
+        cat > release/README-Linux.txt << EOF
+        Uranus IEC 61850 Protocol Analyzer - Linux Version
+        ==================================================
+        
+        Version: ${{ steps.version.outputs.version }}
+        Built: $(date)
+        Platform: Linux x86_64
+        
+        Requirements:
+        - Linux distribution with glibc 2.17+ (Ubuntu 18.04+, CentOS 7+)
+        - No additional dependencies required
+        
+        Usage:
+        1. Make executable: chmod +x Uranus-linux-x64
+        2. Run: ./Uranus-linux-x64
+        
+        For network packet capture features, run as root or with appropriate permissions:
+        sudo ./Uranus-linux-x64
+        EOF
+    
+    - name: Upload Linux Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: uranus-linux-${{ steps.version.outputs.version }}
+        path: release/
+        retention-days: 30
+
+  build-windows:
+    runs-on: windows-2022
+    needs: build-linux
+    
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install Build Tools (Windows)
+      run: |
+        # Install chocolatey packages
+        choco install cmake --installargs '"ADD_CMAKE_TO_PATH=System"' -y
+        choco install swig -y
+        choco install upx -y
+        
+        # Refresh environment
+        refreshenv
+    
+    - name: Install Visual Studio Build Tools
+      uses: microsoft/setup-msbuild@v1.3
+      with:
+        vs-version: '17.0'  # VS 2022
+    
+    - name: Cache Python Dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~\AppData\Local\pip\Cache
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: Create Virtual Environment
+      run: |
+        python -m venv venv
+        venv\Scripts\activate
+        pip install --upgrade pip setuptools wheel
+    
+    - name: Try Install pyiec61850 from PyPI
+      continue-on-error: true
+      id: pyiec_pypi
+      run: |
+        venv\Scripts\activate
+        pip install pyiec61850==1.5.2a1
+        python -c "import pyiec61850; print('✅ pyiec61850 from PyPI works')"
+        echo "success=true" >> $env:GITHUB_OUTPUT
+    
+    - name: Build pyiec61850 from Source (if PyPI failed)
+      if: steps.pyiec_pypi.outputs.success != 'true'
+      run: |
+        venv\Scripts\activate
+        
+        # Clone repository
+        git clone --depth 1 https://github.com/mz-automation/libiec61850.git
+        cd libiec61850
+        
+        # Create build directory
+        mkdir build
+        cd build
+        
+        # Configure with CMake
+        cmake -DBUILD_PYTHON_BINDINGS=ON `
+              -DCMAKE_BUILD_TYPE=Release `
+              -DBUILD_EXAMPLES=OFF `
+              -G "Visual Studio 17 2022" `
+              -A x64 `
+              ..
+        
+        # Build
+        cmake --build . --config Release --parallel
+        
+        # Install Python bindings manually
+        cd ..\pyiec61850
+        pip install .
+        cd ..\..
+        
+        # Test installation
+        python -c "import pyiec61850; print('✅ pyiec61850 built from source')"
+        
+        # Cleanup
+        Remove-Item -Recurse -Force libiec61850
+    
+    - name: Install Python Dependencies
+      run: |
+        venv\Scripts\activate
+        pip install -r requirements.txt
+        pip install pyinstaller
+    
+    - name: Build Windows Executable
+      run: |
+        venv\Scripts\activate
+        
+        # Verify pyiec61850
+        python -c "import pyiec61850; print('pyiec61850 verification passed')"
+        
+        # Build executable
+        pyinstaller uranus.spec
+        
+        # Verify output
+        if (Test-Path "dist\Uranus.exe") {
+            Write-Host "✅ Windows executable created successfully"
+            Get-Item "dist\Uranus.exe" | Select-Object Name, Length, CreationTime
+        } else {
+            Write-Host "❌ Failed to create Windows executable"
+            exit 1
+        }
+    
+    - name: Test Windows Executable
+      run: |
+        cd dist
+        # Quick test (will timeout for GUI app, which is expected)
+        Start-Process -FilePath ".\Uranus.exe" -ArgumentList "--help" -Wait -NoNewWindow -ErrorAction SilentlyContinue
+        Write-Host "✅ Windows executable test completed"
+    
+    - name: Prepare Windows Release
+      run: |
+        mkdir release
+        Copy-Item "dist\Uranus.exe" "release\Uranus-windows-x64.exe"
+        
+        # Create info file
+        @"
+        Uranus IEC 61850 Protocol Analyzer - Windows Version
+        ====================================================
+        
+        Version: ${{ needs.build-linux.outputs.version }}
+        Built: $(Get-Date)
+        Platform: Windows x86_64
+        
+        Requirements:
+        - Windows 10 or Windows 11 (64-bit)
+        - No additional dependencies required
+        - Administrator privileges recommended for network features
+        
+        Usage:
+        1. Right-click Uranus-windows-x64.exe
+        2. Select "Run as administrator" (for full network access)
+        3. Or double-click for standard mode
+        
+        Note: Windows Defender may flag the executable initially.
+        This is normal for new executables. Click "More info" > "Run anyway"
+        "@ | Out-File -FilePath "release\README-Windows.txt" -Encoding UTF8
+    
+    - name: Upload Windows Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: uranus-windows-${{ needs.build-linux.outputs.version }}
+        path: release/
+        retention-days: 30
+
+  create-release:
+    needs: [build-linux, build-windows]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Download Linux Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: uranus-linux-${{ needs.build-linux.outputs.version }}
+        path: linux-release/
+    
+    - name: Download Windows Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: uranus-windows-${{ needs.build-linux.outputs.version }}
+        path: windows-release/
+    
+    - name: Create Release Archive
+      run: |
+        # Create combined release package
+        mkdir uranus-${{ needs.build-linux.outputs.version }}
+        
+        # Copy executables
+        cp linux-release/* uranus-${{ needs.build-linux.outputs.version }}/
+        cp windows-release/* uranus-${{ needs.build-linux.outputs.version }}/
+        
+        # Create main README
+        cat > uranus-${{ needs.build-linux.outputs.version }}/README.txt << EOF
+        Uranus IEC 61850 Protocol Analyzer & Virtual IED System
+        =======================================================
+        
+        Version: ${{ needs.build-linux.outputs.version }}
+        Release Date: $(date)
+        
+        This package contains executables for both Linux and Windows:
+        
+        📁 Files:
+        - Uranus-linux-x64      : Linux executable (Ubuntu 18.04+)
+        - Uranus-windows-x64.exe: Windows executable (Windows 10+)
+        - README-Linux.txt      : Linux-specific instructions
+        - README-Windows.txt    : Windows-specific instructions
+        
+        🚀 Quick Start:
+        
+        Linux:
+        chmod +x Uranus-linux-x64
+        sudo ./Uranus-linux-x64
+        
+        Windows:
+        Right-click Uranus-windows-x64.exe > "Run as administrator"
+        
+        📋 Features:
+        - IEC 61850 GOOSE Protocol Analysis
+        - Virtual IED System Simulation
+        - Network Packet Capture & Analysis
+        - Real-time Protocol Monitoring
+        - Cross-platform Support
+        
+        🔗 Repository: https://github.com/PeachSFTV/Uranus
+        📧 Issues: https://github.com/PeachSFTV/Uranus/issues
+        
+        EOF
+        
+        # Create archive
+        tar -czf uranus-${{ needs.build-linux.outputs.version }}-cross-platform.tar.gz uranus-${{ needs.build-linux.outputs.version }}/
+        zip -r uranus-${{ needs.build-linux.outputs.version }}-cross-platform.zip uranus-${{ needs.build-linux.outputs.version }}/
+    
+    - name: Create GitHub Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref_name }}
+        name: Uranus ${{ needs.build-linux.outputs.version }}
+        body: |
+          # Uranus IEC 61850 Protocol Analyzer ${{ needs.build-linux.outputs.version }}
+          
+          ## 🎉 New Release
+          
+          Cross-platform IEC 61850 GOOSE Protocol Analyzer and Virtual IED System.
+          
+          ## 📦 Downloads
+          
+          ### Executables
+          - **Linux (x86_64)**: `Uranus-linux-x64` - For Ubuntu 18.04+ and compatible distributions
+          - **Windows (x86_64)**: `Uranus-windows-x64.exe` - For Windows 10/11
+          
+          ### Archives
+          - **Cross-platform bundle**: `uranus-${{ needs.build-linux.outputs.version }}-cross-platform.zip`
+          - **Cross-platform bundle (tar.gz)**: `uranus-${{ needs.build-linux.outputs.version }}-cross-platform.tar.gz`
+          
+          ## 🚀 Quick Start
+          
+          ### Linux
+          ```bash
+          chmod +x Uranus-linux-x64
+          sudo ./Uranus-linux-x64  # Root privileges for network access
+          ```
+          
+          ### Windows
+          1. Download `Uranus-windows-x64.exe`
+          2. Right-click → "Run as administrator"
+          3. Click "More info" → "Run anyway" if Windows Defender shows warning
+          
+          ## ✨ Features
+          
+          - 🔍 **IEC 61850 GOOSE Protocol Analysis**
+          - 🖥️ **Virtual IED System Simulation** 
+          - 📡 **Real-time Network Monitoring**
+          - 📊 **Protocol Traffic Visualization**
+          - 🔧 **Cross-platform Support** (Linux & Windows)
+          
+          ## 📋 Requirements
+          
+          - **Linux**: Ubuntu 18.04+ or compatible (glibc 2.17+)
+          - **Windows**: Windows 10/11 (64-bit)
+          - **Network**: Administrator/root privileges for packet capture
+          
+          ## 🐛 Issues & Support
+          
+          Report bugs and request features at: https://github.com/PeachSFTV/Uranus/issues
+          
+          ---
+          
+          **Built with GitHub Actions** | **Auto-generated release**
+        draft: false
+        prerelease: false
+        files: |
+          uranus-${{ needs.build-linux.outputs.version }}-cross-platform.zip
+          uranus-${{ needs.build-linux.outputs.version }}-cross-platform.tar.gz

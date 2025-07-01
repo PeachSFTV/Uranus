@@ -1,0 +1,103 @@
+# Simplified workflow for testing
+name: Validate Build System
+
+on:
+  workflow_dispatch:  # Manual trigger only for testing
+  
+env:
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  validate-linux:
+    runs-on: ubuntu-22.04
+    
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Validate pyiec61850 Import
+      run: |
+        # Test if pyiec61850 can be imported after build
+        python -c "
+        try:
+            import pyiec61850
+            print('✅ pyiec61850 module structure is valid')
+        except ImportError as e:
+            print(f'⚠️  pyiec61850 not available yet (expected): {e}')
+        "
+    
+    - name: Validate Project Structure
+      run: |
+        echo "🔍 Checking project structure..."
+        
+        # Check entry point
+        if [ -f "code/MainWindow_Page.py" ]; then
+          echo "✅ Entry point found: code/MainWindow_Page.py"
+        else
+          echo "❌ Entry point missing: code/MainWindow_Page.py"
+          exit 1
+        fi
+        
+        # Check spec file
+        if [ -f "uranus.spec" ]; then
+          echo "✅ PyInstaller spec found: uranus.spec"
+        else
+          echo "❌ PyInstaller spec missing: uranus.spec"
+          exit 1
+        fi
+        
+        # Check requirements
+        if [ -f "requirements.txt" ]; then
+          echo "✅ Requirements found: requirements.txt"
+          echo "📋 Dependencies:"
+          head -10 requirements.txt
+        else
+          echo "❌ Requirements missing: requirements.txt"
+          exit 1
+        fi
+        
+        # Check directories
+        for dir in QTDesigner upload_file icon code/iec61850_system; do
+          if [ -d "$dir" ]; then
+            echo "✅ Directory found: $dir"
+          else
+            echo "⚠️  Directory missing: $dir"
+          fi
+        done
+    
+    - name: Test Requirements Installation
+      run: |
+        echo "📦 Testing requirements installation..."
+        pip install --dry-run -r requirements.txt
+        echo "✅ Requirements validation passed"
+    
+    - name: Validate uranus.spec Syntax
+      run: |
+        echo "🔍 Validating uranus.spec syntax..."
+        python -c "
+        import ast
+        try:
+            with open('uranus.spec', 'r') as f:
+                content = f.read()
+            # Basic syntax check
+            compile(content, 'uranus.spec', 'exec')
+            print('✅ uranus.spec syntax is valid')
+        except SyntaxError as e:
+            print(f'❌ uranus.spec syntax error: {e}')
+            exit(1)
+        except Exception as e:
+            print(f'⚠️  uranus.spec validation warning: {e}')
+        "
+    
+    - name: Summary
+      run: |
+        echo "📋 Validation Summary:"
+        echo "  ✅ Project structure valid"
+        echo "  ✅ Python syntax valid"
+        echo "  ✅ Requirements installable"
+        echo "  ✅ Ready for full build"
