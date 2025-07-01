@@ -1,7 +1,9 @@
 import faulthandler
+from PyQt6.QtWidgets import QWidget, QFileDialog, QMessageBox, QVBoxLayout, QPushButton, QLabel
 faulthandler.enable()
 
-from PyQt6.QtWidgets import QWidget, QFileDialog, QMessageBox
+from PyQt6.QtWidgets import QWidget, QFileDialog, QMessageBox, QVBoxLayout, QPushButton, QLabel
+from ui_helper import load_ui_safe, UIHelper
 from PyQt6.QtCore import QTimer
 import os
 import shutil
@@ -20,7 +22,24 @@ class UploadFilePage(QWidget):
         super().__init__()
         from PyQt6 import uic
         ui_file = get_ui_path('Publisher_Page.ui')
-        uic.loadUi(ui_file, self)
+        # Load UI and set layout
+        widget = load_ui_safe(ui_file)
+        if widget:
+            # Create layout and add loaded widget
+            layout = QVBoxLayout(self)
+            layout.setContentsMargins(0, 0, 0, 0)
+            layout.addWidget(widget)
+            
+            # Get specific widgets we need
+            self.uploadfile_button = widget.findChild(QPushButton, 'uploadfile_button')
+            self.back_button = widget.findChild(QPushButton, 'back_button')
+        else:
+            # Fallback: create basic widgets
+            from PyQt6.QtWidgets import QVBoxLayout, QLabel
+            layout = QVBoxLayout(self)
+            layout.addWidget(QLabel("Failed to load UI file"))
+            self.uploadfile_button = None
+            self.back_button = None
 
         self.back_button_pressed = back_to_main_ui
         self.uploadfile_button = self.findChild(QWidget, 'uploadfile_button')

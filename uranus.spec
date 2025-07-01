@@ -72,10 +72,11 @@ def find_pyiec61850():
 pyiec_paths, pyiec_files = find_pyiec61850()
 
 # Data files - Include project assets
+# Data files - Include project assets
 datas = [
-    ('QTDesigner', 'QTDesigner'),
-    ('upload_file', 'upload_file'),
-    ('icon', 'icon'),
+    ('code/QTDesigner', 'QTDesigner'),
+    ('code/upload_file', 'upload_file'),
+    ('code/icon', 'icon'),
     ('code/iec61850_system', 'iec61850_system'),
 ]
 
@@ -177,7 +178,7 @@ a = Analysis(
     hiddenimports=hiddenimports,
     hookspath=[],
     hooksconfig={},
-    runtime_hooks=[],
+    runtime_hooks=['pyi_rth_ui_fix.py'] if os.path.exists('pyi_rth_ui_fix.py') else [],
     excludes=excludes,
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
@@ -210,7 +211,7 @@ if is_windows:
         target_arch=None,
         codesign_identity=None,
         entitlements_file=None,
-        icon='icon/UranusIcon.ico' if os.path.exists('icon/UranusIcon.ico') else None,
+        icon='code/icon/UranusIcon.ico' if os.path.exists('code/icon/UranusIcon.ico') else None,
         version='version_info.txt' if os.path.exists('version_info.txt') else None,
         uac_admin=True,  # Request admin privileges for network access
         manifest='uranus.manifest' if os.path.exists('uranus.manifest') else None,

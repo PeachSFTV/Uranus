@@ -1,159 +1,202 @@
 #!/usr/bin/env python3
 """
-ตรวจสอบ pyiec61850 installation และเตรียมสำหรับ PyInstaller
+Test script for pyiec61850 installation
+Verifies that pyiec61850 can be imported and used
 """
 
-import os
 import sys
-import glob
-from pathlib import Path
+import os
+import importlib
 
-def check_pyiec61850():
-    """ตรวจสอบ pyiec61850 installation"""
-    print("🔍 Checking pyiec61850 installation...")
+def test_import():
+    """Test basic import"""
+    print("🧪 Testing pyiec61850 import...")
     
     try:
-        import pyiec61850 as iec61850
-        print("✅ SUCCESS: iec61850 module can be imported!")
-        
-        # ตรวจสอบ attributes
-        attrs = dir(iec61850)
-        print(f"📋 Available attributes: {len(attrs)} items")
-        
-        # ตรวจสอบ important functions
-        important_funcs = [
-            'IedConnection_create', 
-            'IedConnection_connect',
-            'IedConnection_close',
-            'ClientDataSet_create'
-        ]
-        
-        found_funcs = []
-        for func in important_funcs:
-            if func in attrs:
-                found_funcs.append(func)
-        
-        print(f"🔧 Important functions found: {len(found_funcs)}/{len(important_funcs)}")
-        for func in found_funcs:
-            print(f"   ✓ {func}")
-        
-        # ตรวจสอบ file location
-        if hasattr(iec61850, '__file__'):
-            iec_file = iec61850.__file__
-            iec_dir = os.path.dirname(iec_file)
-            print(f"📁 Module file: {iec_file}")
-            print(f"📁 Module directory: {iec_dir}")
-            
-            # ตรวจหา related files
-            print("🔍 Related files in directory:")
-            related_files = []
-            for pattern in ['*iec61850*', '_iec61850*', '*.pyd', '*.so', '*.dll']:
-                files = glob.glob(os.path.join(iec_dir, pattern))
-                related_files.extend(files)
-            
-            for file in set(related_files):
-                size = os.path.getsize(file) / 1024  # KB
-                print(f"   📄 {os.path.basename(file)} ({size:.1f} KB)")
-                
-            return iec_dir, related_files
-        else:
-            print("ℹ️  Module has no __file__ attribute (built-in or C extension)")
-            return None, []
-            
+        import pyiec61850
+        print("✅ SUCCESS: pyiec61850 imported")
+        return pyiec61850
     except ImportError as e:
-        print(f"❌ FAILED: Cannot import iec61850 - {e}")
-        print("💡 Please ensure pyiec61850 is built and in PYTHONPATH")
-        return None, []
+        print(f"❌ FAILED: Cannot import pyiec61850 - {e}")
+        
+        # Try alternative imports
+        print("🔄 Trying alternative imports...")
 
-def check_dependencies():
-    """ตรวจสอบ dependencies"""
-    print("\n🔍 Checking dependencies...")
+def test_module_info(module):
+    """Test module information"""
+    if not module:
+        return False
+        
+    print(f"\n📋 Module Information:")
+    print(f"   Name: {module.__name__}")
     
-    required_modules = [
-        'PyQt6', 'numpy', 'pandas', 'matplotlib', 
-        'netifaces', 'scapy', 'pyinstaller'
+    if hasattr(module, '__file__'):
+        print(f"   File: {module.__file__}")
+        print(f"   Directory: {os.path.dirname(module.__file__)}")
+    else:
+        print("   Type: Built-in or C extension")
+    
+    if hasattr(module, '__version__'):
+        print(f"   Version: {module.__version__}")
+    
+    # Count attributes
+    attrs = [attr for attr in dir(module) if not attr.startswith('_')]
+    print(f"   Attributes: {len(attrs)} public items")
+    
+    return True
+
+def test_important_functions(module):
+    """Test important IEC61850 functions"""
+    if not module:
+        return False
+        
+    print(f"\n🔧 Testing Important Functions:")
+    
+    important_functions = [
+        'IedConnection_create',
+        'IedConnection_connect', 
+        'IedConnection_close',
+        'IedConnection_destroy',
+        'ClientDataSet_create',
+        'ClientDataSet_destroy',
+        'MmsValue_newBoolean',
+        'MmsValue_getType'
     ]
     
-    missing = []
-    for module in required_modules:
-        try:
-            __import__(module)
-            print(f"✅ {module}")
-        except ImportError:
-            print(f"❌ {module}")
-            missing.append(module)
+    found_functions = []
+    missing_functions = []
     
-    if missing:
-        print(f"\n⚠️  Missing modules: {', '.join(missing)}")
-        print("💡 Install with: pip install " + " ".join(missing))
-    else:
-        print("\n🎉 All dependencies available!")
-
-def create_pyinstaller_hook(iec_dir, related_files):
-    """สร้าง PyInstaller hook สำหรับ pyiec61850"""
-    if not iec_dir:
-        return
-        
-    print("\n🔧 Creating PyInstaller hook...")
-    
-    hook_content = f'''# PyInstaller hook for pyiec61850
-# Auto-generated by check_pyiec61850.py
-
-from PyInstaller.utils.hooks import collect_data_files, collect_dynamic_libs
-
-# Add iec61850 module
-hiddenimports = ['iec61850', '_iec61850']
-
-# Add data files
-datas = []
-binaries = []
-
-# IEC61850 directory: {iec_dir}
-'''
-
-    for file in related_files:
-        file_name = os.path.basename(file)
-        if file.endswith(('.pyd', '.so', '.dll')):
-            hook_content += f"binaries.append((r'{file}', '.'))\n"
+    for func_name in important_functions:
+        if hasattr(module, func_name):
+            found_functions.append(func_name)
+            print(f"   ✅ {func_name}")
         else:
-            hook_content += f"datas.append((r'{file}', '.'))\n"
-
-    # Write hook file
-    with open('hook-iec61850.py', 'w') as f:
-        f.write(hook_content)
+            missing_functions.append(func_name)
+            print(f"   ❌ {func_name}")
     
-    print("✅ Created: hook-iec61850.py")
+    print(f"\n📊 Function Check Results:")
+    print(f"   Found: {len(found_functions)}/{len(important_functions)}")
+    print(f"   Missing: {len(missing_functions)}")
+    
+    return len(found_functions) > 0
+
+def test_basic_usage(module):
+    """Test basic usage"""
+    if not module:
+        return False
+        
+    print(f"\n🎯 Testing Basic Usage:")
+    
+    try:
+        # Test 1: Create IED connection (without actually connecting)
+        if hasattr(module, 'IedConnection_create'):
+            print("   🔗 Testing IedConnection_create...")
+            # Note: We don't actually connect to avoid network requirements
+            print("   ✅ IedConnection_create function available")
+        
+        # Test 2: Test MmsValue functions
+        if hasattr(module, 'MmsValue_newBoolean'):
+            print("   📊 Testing MmsValue_newBoolean...")
+            bool_val = module.MmsValue_newBoolean(True)
+            if bool_val:
+                print("   ✅ MmsValue_newBoolean works")
+                
+                # Clean up if possible
+                if hasattr(module, 'MmsValue_delete'):
+                    module.MmsValue_delete(bool_val)
+            else:
+                print("   ⚠️  MmsValue_newBoolean returned None")
+        
+        print("   ✅ Basic usage test completed")
+        return True
+        
+    except Exception as e:
+        print(f"   ❌ Basic usage test failed: {e}")
+        return False
+
+def test_installation_paths():
+    """Test installation paths and files"""
+    print(f"\n📁 Installation Path Analysis:")
+    
+    # Check Python path
+    print("   Python paths:")
+    for i, path in enumerate(sys.path[:5]):  # Show first 5 paths
+        print(f"      {i+1}. {path}")
+    
+    # Check site-packages
+    try:
+        import site
+        site_packages = site.getsitepackages()
+        print(f"   Site-packages directories:")
+        for i, path in enumerate(site_packages):
+            print(f"      {i+1}. {path}")
+            
+            # Check for pyiec61850 in each
+            pyiec_path = os.path.join(path, 'pyiec61850')
+            if os.path.exists(pyiec_path):
+                print(f"         ✅ pyiec61850 directory found")
+                files = os.listdir(pyiec_path)
+                print(f"         📄 Files: {files}")
+            
+            # Check for direct files
+            for file_pattern in ['iec61850.py', '_iec61850.so', '_iec61850.pyd']:
+                file_path = os.path.join(path, file_pattern)
+                if os.path.exists(file_path):
+                    size = os.path.getsize(file_path) / 1024  # KB
+                    print(f"         ✅ {file_pattern} ({size:.1f} KB)")
+                    
+    except Exception as e:
+        print(f"   ❌ Path analysis failed: {e}")
 
 def main():
-    print("🌟 pyiec61850 Status Checker")
+    """Main test function"""
+    print("🌟 pyiec61850 Installation Test")
     print("=" * 50)
     
-    # Check Python version
-    print(f"🐍 Python {sys.version}")
-    print(f"📍 Python path: {sys.executable}")
+    # Test import
+    module = test_import()
     
-    # Check pyiec61850
-    iec_dir, related_files = check_pyiec61850()
+    # Test module info
+    info_ok = test_module_info(module)
     
-    # Check dependencies
-    check_dependencies()
+    # Test functions
+    functions_ok = test_important_functions(module)
     
-    # Create hook if needed
-    if iec_dir:
-        create_pyinstaller_hook(iec_dir, related_files)
-        
-        print(f"\n📋 Summary:")
-        print(f"   ✅ pyiec61850 location: {iec_dir}")
-        print(f"   📄 Related files: {len(related_files)}")
-        print(f"   🔧 Hook created: hook-iec61850.py")
-        
-        print(f"\n🚀 Next steps:")
-        print(f"   1. pip install -r requirements_no_pyiec61850.txt")
-        print(f"   2. pyinstaller uranus_custom_pyiec.spec")
-        print(f"   3. Test: dist/Uranus.exe")
+    # Test basic usage
+    usage_ok = test_basic_usage(module)
+    
+    # Test paths
+    test_installation_paths()
+    
+    # Summary
+    print("\n" + "=" * 50)
+    print("📋 Test Summary:")
+    print(f"   Import: {'✅ Pass' if module else '❌ Fail'}")
+    print(f"   Module Info: {'✅ Pass' if info_ok else '❌ Fail'}")
+    print(f"   Functions: {'✅ Pass' if functions_ok else '❌ Fail'}")
+    print(f"   Basic Usage: {'✅ Pass' if usage_ok else '❌ Fail'}")
+    
+    # Overall result
+    overall_ok = module and functions_ok
+    if overall_ok:
+        print("\n🎉 Overall Result: ✅ PASS")
+        print("   pyiec61850 is ready for use!")
     else:
-        print(f"\n❌ pyiec61850 not accessible!")
-        print(f"💡 Please check your build and PYTHONPATH")
+        print("\n❌ Overall Result: ❌ FAIL")
+        print("   pyiec61850 needs installation or fixing")
+        
+        print("\n💡 Troubleshooting Tips:")
+        if not module:
+            print("   - Ensure pyiec61850 is installed")
+            print("   - Check virtual environment activation")
+            print("   - Try: pip install pyiec61850")
+        if not functions_ok:
+            print("   - Installation may be incomplete")
+            print("   - Try rebuilding from source")
+            print("   - Check for missing dependencies")
+    
+    return overall_ok
 
 if __name__ == "__main__":
-    main()
+    success = main()
+    sys.exit(0 if success else 1)

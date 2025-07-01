@@ -6,6 +6,7 @@ faulthandler.enable()
 
 import os
 
+from ui_helper import load_ui_safe, UIHelper
 from PyQt6.QtWidgets import QWidget, QLineEdit, QTextBrowser, QPushButton
 
 from PyQt6 import uic
@@ -30,7 +31,15 @@ class LoginPage(QWidget):
 
          # โหลด UI จาก Qt Designer (.ui) - ใช้ resource_helper
         ui_file = get_ui_path('LoginUi.ui')
-        uic.loadUi(ui_file, self)
+        widget = load_ui_safe(ui_file)
+        if widget:
+            # Copy widget attributes
+            for attr in dir(widget):
+                if not attr.startswith('_'):
+                    try:
+                        setattr(self, attr, getattr(widget, attr))
+                    except:
+                        pass
 
 
         self.on_login_success = on_login_success  # ฟังก์ชันที่จะเรียกเมื่อ login สำเร็จ

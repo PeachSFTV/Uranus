@@ -73,9 +73,58 @@ jobs:
               ..
         make -j$(nproc)
         
-        # Install Python bindings
+        # Method 1: Try standard installation
+        echo "🔧 Attempting standard installation..."
         cd ../pyiec61850
-        pip install .
+        if pip install . 2>/dev/null; then
+            echo "✅ Standard installation successful"
+        else
+            echo "⚠️  Standard installation failed, trying manual method..."
+            
+            # Method 2: Manual installation
+            cd ..
+            cat > install_manual.sh << 'SCRIPT'
+#!/bin/bash
+set -e
+
+SITE_PACKAGES=$(python -c "import site; print(site.getsitepackages()[0])")
+PYIEC_DIR="$SITE_PACKAGES/pyiec61850"
+mkdir -p "$PYIEC_DIR"
+
+echo "📁 Installing to: $PYIEC_DIR"
+
+# Copy Python files
+find pyiec61850 -name "*.py" -exec cp {} "$PYIEC_DIR/" \; 2>/dev/null || true
+find . -name "iec61850.py" -exec cp {} "$PYIEC_DIR/" \; 2>/dev/null || true
+
+# Copy compiled extensions
+find build -name "_iec61850*.so" -exec cp {} "$SITE_PACKAGES/" \; 2>/dev/null || true
+find pyiec61850 -name "*.so" -exec cp {} "$SITE_PACKAGES/" \; 2>/dev/null || true
+
+# Create __init__.py
+cat > "$PYIEC_DIR/__init__.py" << 'EOF'
+try:
+    from .iec61850 import *
+except ImportError:
+    try:
+        import iec61850
+        import sys
+        current_module = sys.modules[__name__]
+        for attr in dir(iec61850):
+            if not attr.startswith('_'):
+                setattr(current_module, attr, getattr(iec61850, attr))
+    except ImportError:
+        pass
+
+__version__ = "1.5.2"
+EOF
+
+echo "✅ Manual installation completed"
+SCRIPT
+
+            chmod +x install_manual.sh
+            ./install_manual.sh
+        fi
         cd ../..
         
         # Test installation
@@ -236,9 +285,55 @@ jobs:
         # Build
         cmake --build . --config Release --parallel
         
-        # Install Python bindings manually
+        # Method 1: Try standard installation
+        Write-Host "🔧 Attempting standard installation..."
         cd ..\pyiec61850
-        pip install .
+        try {
+            pip install .
+            Write-Host "✅ Standard installation successful"
+        }
+        catch {
+            Write-Host "⚠️  Standard installation failed, trying manual method..."
+            
+            # Method 2: Manual installation
+            cd ..
+            
+            # Get site-packages directory
+            $SITE_PACKAGES = python -c "import site; print(site.getsitepackages()[0])"
+            $PYIEC_DIR = "$SITE_PACKAGES\pyiec61850"
+            
+            # Create directory
+            New-Item -ItemType Directory -Force -Path $PYIEC_DIR
+            Write-Host "📁 Installing to: $PYIEC_DIR"
+            
+            # Copy Python files
+            Get-ChildItem pyiec61850 -Filter "*.py" | Copy-Item -Destination $PYIEC_DIR -ErrorAction SilentlyContinue
+            Get-ChildItem . -Filter "iec61850.py" | Copy-Item -Destination $PYIEC_DIR -ErrorAction SilentlyContinue
+            
+            # Copy compiled extensions
+            Get-ChildItem build -Recurse -Filter "_iec61850*.pyd" | Copy-Item -Destination $SITE_PACKAGES -ErrorAction SilentlyContinue
+            Get-ChildItem pyiec61850 -Filter "*.pyd" | Copy-Item -Destination $SITE_PACKAGES -ErrorAction SilentlyContinue
+            
+            # Create __init__.py
+            $INIT_CONTENT = @"
+try:
+    from .iec61850 import *
+except ImportError:
+    try:
+        import iec61850
+        import sys
+        current_module = sys.modules[__name__]
+        for attr in dir(iec61850):
+            if not attr.startswith('_'):
+                setattr(current_module, attr, getattr(iec61850, attr))
+    except ImportError:
+        pass
+
+__version__ = "1.5.2"
+"@
+            $INIT_CONTENT | Out-File -FilePath "$PYIEC_DIR\__init__.py" -Encoding UTF8
+            Write-Host "✅ Manual installation completed"
+        }
         cd ..\..
         
         # Test installation

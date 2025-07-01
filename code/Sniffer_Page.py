@@ -6,6 +6,7 @@ Real-time GOOSE message capture and analysis tool
 Enhanced version - รองรับ IP address filtering ผ่าน ARP lookup
 """
 
+from ui_helper import load_ui_safe, UIHelper
 from PyQt6 import uic
 from PyQt6.QtWidgets import (
     QWidget, QPushButton, QTableWidget, QTreeWidget, QTableWidgetItem,
@@ -752,7 +753,15 @@ class GOOSESnifferWindow(QWidget):
         
         # Load UI
         ui_file = get_ui_path('Sniffer_Page.ui')
-        uic.loadUi(ui_file, self)
+        widget = load_ui_safe(ui_file)
+        if widget:
+            # Copy widget attributes
+            for attr in dir(widget):
+                if not attr.startswith('_'):
+                    try:
+                        setattr(self, attr, getattr(widget, attr))
+                    except:
+                        pass
         
         # Extract widgets from UI
         

@@ -7,6 +7,7 @@ No hardware connections required
 Fixed version with safety features for commissioning
 """
 
+from ui_helper import load_ui_safe, UIHelper
 from PyQt6 import uic
 from PyQt6.QtWidgets import (
     QWidget, QPushButton, QListWidget, QTreeWidget, QListWidgetItem,
@@ -155,7 +156,15 @@ class VirtualIEDSystem(QWidget):
         
         # Load UI
         ui_file = get_ui_path('Publisher_Page.ui')
-        uic.loadUi(ui_file, self)
+        widget = load_ui_safe(ui_file)
+        if widget:
+            # Copy widget attributes
+            for attr in dir(widget):
+                if not attr.startswith('_'):
+                    try:
+                        setattr(self, attr, getattr(widget, attr))
+                    except:
+                        pass
         # Then you need to extract widgets from the loaded widget
 
         self.fileslist_button = self.findChild(QPushButton, 'fileslist_button')

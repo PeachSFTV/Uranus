@@ -133,6 +133,27 @@ build_exe() {
         exit 1
     fi
     
+    # Check and patch UI loading
+    log_info "Checking UI files and patching if needed..."
+    
+    if [[ -f "patch_ui_loading.py" ]]; then
+        log_info "Applying UI loading patches..."
+        python patch_ui_loading.py
+    else
+        log_warning "patch_ui_loading.py not found, skipping UI patches"
+    fi
+    
+    # Check UI files exist
+    if [[ -d "QTDesigner" ]]; then
+        UI_COUNT=$(find QTDesigner -name "*.ui" | wc -l)
+        log_info "Found $UI_COUNT UI files in QTDesigner/"
+        if [[ $UI_COUNT -eq 0 ]]; then
+            log_warning "No .ui files found in QTDesigner directory!"
+        fi
+    else
+        log_warning "QTDesigner directory not found!"
+    fi
+    
     # Run PyInstaller
     log_info "Running PyInstaller..."
     pyinstaller uranus.spec
@@ -144,11 +165,13 @@ build_exe() {
         file dist/Uranus
         
         # Test executable
-        log_info "Testing executable..."
-        if timeout 5s dist/Uranus --help &>/dev/null; then
+        log_info "Testing executable (quick test)..."
+        if timeout 10s dist/Uranus --help &>/dev/null; then
             log_success "Executable test passed"
         else
             log_warning "Executable test timed out (normal for GUI apps)"
+            log_info "Trying basic launch test..."
+            timeout 5s dist/Uranus &>/dev/null && log_success "Basic launch test passed" || log_warning "Basic launch test failed"
         fi
         
         # Create release info
@@ -160,9 +183,22 @@ Build Date: $(date)
 Platform: $(uname -a)
 Python Version: $(python --version)
 
+Contents:
+- Uranus: Main executable
+- PyQt6 GUI application with IEC 61850 support
+- pyiec61850 library included
+
 Usage:
   chmod +x Uranus
   sudo ./Uranus  # Run as root for network access
+
+UI Files Status:
+$(if [[ -d "../QTDesigner" ]]; then echo "✅ UI files included"; else echo "⚠️  UI files may be missing"; fi)
+
+Troubleshooting:
+- If UI appears broken, check that .ui files are included
+- For network features, run with sudo privileges
+- Check system compatibility: requires glibc 2.17+
 
 For support and documentation:
   https://github.com/PeachSFTV/Uranus
@@ -174,6 +210,13 @@ EOF
     else
         log_error "Failed to create executable!"
         log_info "Check PyInstaller output above for errors"
+        
+        # Debug information
+        log_info "Debug information:"
+        log_info "  Working directory: $(pwd)"
+        log_info "  Contents of dist/: $(ls -la dist/ 2>/dev/null || echo 'dist/ not found')"
+        log_info "  PyInstaller spec: $(ls -la *.spec 2>/dev/null || echo 'No .spec files found')"
+        
         exit 1
     fi
 }

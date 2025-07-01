@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Dict, List, Any, Optional, Tuple
 from datetime import datetime
 import time
+from ui_helper import load_ui_safe, UIHelper
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QListWidget, QListWidgetItem, 
     QScrollArea, QVBoxLayout, QFrame, QLabel, QPushButton, 
@@ -807,7 +808,15 @@ class EasyEditorWidget(QWidget):
         ui_file = get_ui_path('EasyEditer_Page.ui')    
         try:
             # Load UI file 
-            self = uic.loadUi(ui_file, self)
+            widget = load_ui_safe(ui_file)
+            if widget:
+                # Copy widget attributes
+                for attr in dir(widget):
+                    if not attr.startswith('_'):
+                        try:
+                            setattr(self, attr, getattr(widget, attr))
+                        except:
+                            pass
             
             # Extract UI elements using findChild
             self.backBtn = self.findChild(QPushButton, 'backBtn')

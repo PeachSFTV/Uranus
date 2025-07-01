@@ -1,0 +1,1043 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>RealIEDWidget</class>
+ <widget class="QWidget" name="RealIEDWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1200</width>
+    <height>800</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Real IED System - IEC 61850 Communication</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout_main">
+   <property name="spacing">
+    <number>6</number>
+   </property>
+   <property name="leftMargin">
+    <number>6</number>
+   </property>
+   <property name="topMargin">
+    <number>6</number>
+   </property>
+   <property name="rightMargin">
+    <number>6</number>
+   </property>
+   <property name="bottomMargin">
+    <number>6</number>
+   </property>
+   
+   <!-- Left Panel -->
+   <item>
+    <widget class="QWidget" name="left_panel" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>350</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>400</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_left">
+      <property name="spacing">
+       <number>6</number>
+      </property>
+      
+      <!-- File Management Section -->
+      <item>
+       <widget class="QGroupBox" name="file_group">
+        <property name="title">
+         <string>📁 SCL File Management</string>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>120</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>140</height>
+         </size>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_file">
+         <property name="spacing">
+          <number>4</number>
+         </property>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_file">
+           <item>
+            <widget class="QPushButton" name="fileslist_button">
+             <property name="text">
+              <string>📋 Load SCL Files</string>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>30</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="refresh_files_btn">
+             <property name="text">
+              <string>🔄</string>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>35</width>
+               <height>30</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QListWidget" name="fileslist_show">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>60</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>80</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      
+      <!-- IED Tree Display -->
+      <item>
+       <widget class="QGroupBox" name="ied_tree_group">
+        <property name="title">
+         <string>⚡ Real IED Configuration</string>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>300</height>
+         </size>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_tree">
+         <property name="spacing">
+          <number>4</number>
+         </property>
+         
+         <!-- View Mode Controls -->
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_view_mode">
+           <property name="spacing">
+            <number>4</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="view_mode_label">
+             <property name="text">
+              <string>📊 View:</string>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>40</width>
+               <height>0</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="iedscout_view_btn">
+             <property name="text">
+              <string>📊 IEDScout</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>80</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>100</width>
+               <height>25</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="traditional_view_btn">
+             <property name="text">
+              <string>🌳 Traditional</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>80</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>100</width>
+               <height>25</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_view">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="expand_all_btn">
+             <property name="text">
+              <string>📂</string>
+             </property>
+             <property name="toolTip">
+              <string>Expand All</string>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>30</width>
+               <height>25</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="collapse_all_btn">
+             <property name="text">
+              <string>📁</string>
+             </property>
+             <property name="toolTip">
+              <string>Collapse All</string>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>30</width>
+               <height>25</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         
+         <!-- Section Info -->
+         <item>
+          <widget class="QLabel" name="section_info_label">
+           <property name="text">
+            <string>📡 GOOSE | 📊 Reports | ⚙️ Settings | 📋 Datasets | 🗂️ Data Model</string>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>20</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         
+         <!-- Tree Widget -->
+         <item>
+          <widget class="QTreeWidget" name="ied_tree">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>200</height>
+            </size>
+           </property>
+           <column>
+            <property name="text">
+             <string>Element</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Value</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Type</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Path</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Status</string>
+            </property>
+           </column>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      
+      <!-- Quick Actions -->
+      <item>
+       <widget class="QGroupBox" name="quick_actions_group">
+        <property name="title">
+         <string>⚡ Quick Actions</string>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>80</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>100</height>
+         </size>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_actions">
+         <property name="spacing">
+          <number>4</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QPushButton" name="discover_ieds_btn">
+           <property name="text">
+            <string>🔍 Discover</string>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>25</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QPushButton" name="test_connectivity_btn">
+           <property name="text">
+            <string>🧪 Test All</string>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>25</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QPushButton" name="read_all_btn">
+           <property name="text">
+            <string>📖 Read All</string>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>25</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QPushButton" name="export_data_btn">
+           <property name="text">
+            <string>💾 Export</string>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>25</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      
+     </layout>
+    </widget>
+   </item>
+   
+   <!-- Right Panel -->
+   <item>
+    <widget class="QWidget" name="right_panel" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>600</width>
+       <height>0</height>
+      </size>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_right">
+      <property name="spacing">
+       <number>6</number>
+      </property>
+      
+      <!-- System Control Section -->
+      <item>
+       <widget class="QGroupBox" name="control_group">
+        <property name="title">
+         <string>🎮 Real IED System Control</string>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>140</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>180</height>
+         </size>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_control">
+         <property name="spacing">
+          <number>4</number>
+         </property>
+         
+         <!-- Network Configuration Row -->
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_network">
+           <property name="spacing">
+            <number>6</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="interface_label">
+             <property name="text">
+              <string>🌐 Interface:</string>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>70</width>
+               <height>0</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="network_interface_combo">
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>0</height>
+              </size>
+             </property>
+             <item>
+              <property name="text">
+               <string>eth0</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="external_goose_checkbox">
+             <property name="text">
+              <string>📡 Real GOOSE</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="auto_connect_checkbox">
+             <property name="text">
+              <string>🔗 Auto Connect</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_network">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         
+         <!-- System Control Buttons -->
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_control">
+           <property name="spacing">
+            <number>6</number>
+           </property>
+           <item>
+            <widget class="QPushButton" name="start_system_btn">
+             <property name="text">
+              <string>🚀 Start Real IED System</string>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>35</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="stop_system_btn">
+             <property name="text">
+              <string>🛑 Stop System</string>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>35</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="back_button">
+             <property name="text">
+              <string>EXIT</string>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>70</width>
+               <height>35</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>80</width>
+               <height>35</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         
+         <!-- Status Display -->
+         <item>
+          <widget class="QLabel" name="discovery_status_label">
+           <property name="text">
+            <string>🔍 Ready to discover Real IEDs...</string>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>25</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         
+         <!-- System Status -->
+         <item>
+          <widget class="QPlainTextEdit" name="system_status_text">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>60</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         
+        </layout>
+       </widget>
+      </item>
+      
+      <!-- Communication Logs -->
+      <item>
+       <widget class="QTabWidget" name="logs_tab_widget">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>400</height>
+         </size>
+        </property>
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        
+        <!-- MMS Communication Log -->
+        <widget class="QWidget" name="mms_log_tab">
+         <attribute name="title">
+          <string>📡 MMS Communication</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_mms">
+          <property name="spacing">
+           <number>4</number>
+          </property>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_mms_controls">
+            <property name="spacing">
+             <number>6</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="mms_log_label">
+              <property name="text">
+               <string>📤 MMS Read/Write Operations</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_mms">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="clear_mms_log_btn">
+              <property name="text">
+               <string>🗑️ Clear</string>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>80</width>
+                <height>30</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="save_mms_log_btn">
+              <property name="text">
+               <string>💾 Save</string>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>80</width>
+                <height>30</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QPlainTextEdit" name="pub_log">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>300</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        
+        <!-- GOOSE Communication Log -->
+        <widget class="QWidget" name="goose_log_tab">
+         <attribute name="title">
+          <string>🔄 GOOSE Messages</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_goose">
+          <property name="spacing">
+           <number>4</number>
+          </property>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_goose_controls">
+            <property name="spacing">
+             <number>6</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="goose_log_label">
+              <property name="text">
+               <string>📨 Real GOOSE Reception</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_goose">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="goose_filter_checkbox">
+              <property name="text">
+               <string>Filter</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="clear_goose_log_btn">
+              <property name="text">
+               <string>🗑️ Clear</string>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>80</width>
+                <height>30</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="save_goose_log_btn">
+              <property name="text">
+               <string>💾 Save</string>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>80</width>
+                <height>30</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QPlainTextEdit" name="sub_log">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>300</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        
+        <!-- System Events Log -->
+        <widget class="QWidget" name="events_log_tab">
+         <attribute name="title">
+          <string>📋 System Events</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_events">
+          <property name="spacing">
+           <number>4</number>
+          </property>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_events_controls">
+            <property name="spacing">
+             <number>6</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="events_log_label">
+              <property name="text">
+               <string>🎯 System Events and Alarms</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_events">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QComboBox" name="events_filter_combo">
+              <property name="maximumSize">
+               <size>
+                <width>120</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <item>
+               <property name="text">
+                <string>All Events</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Errors Only</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Warnings Only</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Info Only</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="clear_events_log_btn">
+              <property name="text">
+               <string>🗑️ Clear</string>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>80</width>
+                <height>30</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QPlainTextEdit" name="events_log">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>300</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        
+        <!-- Statistics Tab -->
+        <widget class="QWidget" name="statistics_tab">
+         <attribute name="title">
+          <string>📊 Statistics</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_statistics">
+          <property name="spacing">
+           <number>6</number>
+          </property>
+          <item>
+           <layout class="QGridLayout" name="gridLayout_stats">
+            <property name="spacing">
+             <number>6</number>
+            </property>
+            
+            <!-- Connection Statistics -->
+            <item row="0" column="0" colspan="2">
+             <widget class="QGroupBox" name="connection_stats_group">
+              <property name="title">
+               <string>🔗 Connection Statistics</string>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>120</height>
+               </size>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_connection_stats">
+               <property name="spacing">
+                <number>4</number>
+               </property>
+               <item row="0" column="0">
+                <widget class="QLabel" name="total_ieds_label">
+                 <property name="text">
+                  <string>Total IEDs:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QLabel" name="total_ieds_value">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="connected_ieds_label">
+                 <property name="text">
+                  <string>Connected:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLabel" name="connected_ieds_value">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="avg_response_label">
+                 <property name="text">
+                  <string>Avg Response:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QLabel" name="avg_response_value">
+                 <property name="text">
+                  <string>0ms</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            
+            <!-- Communication Statistics -->
+            <item row="1" column="0" colspan="2">
+             <widget class="QGroupBox" name="comm_stats_group">
+              <property name="title">
+               <string>📡 Communication Statistics</string>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>120</height>
+               </size>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_comm_stats">
+               <property name="spacing">
+                <number>4</number>
+               </property>
+               <item row="0" column="0">
+                <widget class="QLabel" name="mms_operations_label">
+                 <property name="text">
+                  <string>MMS Operations:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QLabel" name="mms_operations_value">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="goose_sent_label">
+                 <property name="text">
+                  <string>GOOSE Sent:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLabel" name="goose_sent_value">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="goose_received_label">
+                 <property name="text">
+                  <string>GOOSE Received:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QLabel" name="goose_received_value">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            
+            <!-- System Uptime -->
+            <item row="2" column="0" colspan="2">
+             <widget class="QGroupBox" name="uptime_group">
+              <property name="title">
+               <string>⏱️ System Uptime</string>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>60</height>
+               </size>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_uptime">
+               <item>
+                <widget class="QLabel" name="uptime_value">
+                 <property name="text">
+                  <string>00:00:00</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            
+           </layout>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_stats">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+        
+       </widget>
+      </item>
+      
+     </layout>
+    </widget>
+   </item>
+   
+  </layout>
+  
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

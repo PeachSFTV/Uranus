@@ -4,6 +4,7 @@ faulthandler.enable()
 import os
 import sys
 from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton
+from ui_helper import load_ui_safe, UIHelper
 from PyQt6.QtGui import QIcon
 from PyQt6 import uic
 from UploadFile_Page import UploadFilePage
@@ -68,7 +69,7 @@ class MyApp(QMainWindow):
         
     def load_main_ui(self):
         ui_file = get_ui_path('MainWindowUi.ui')
-        widget = uic.loadUi(ui_file)
+        widget = load_ui_safe(ui_file)
         self.main_ui = widget
 
        # ฝังลงใน layout ของ self
@@ -79,10 +80,19 @@ class MyApp(QMainWindow):
         self.real_goose_pub_button = self.findChild(QPushButton, 'real_goose_pub_button')
         self.real_goose_sub_button = self.findChild(QPushButton, 'real_goose_sub_button')
         self.easyediter_button = self.findChild(QPushButton, 'easyediter_button')
-        self.upload_file_button.clicked.connect(self.load_uploadfile_ui)
-        self.real_goose_pub_button.clicked.connect(self.goose_pub_ui)
-        self.real_goose_sub_button.clicked.connect(self.goose_sub_ui)
-        self.easyediter_button.clicked.connect(self.load_easyediter_ui)
+        if self.upload_file_button:
+            self.upload_file_button.clicked.connect(self.load_uploadfile_ui)
+        self.real_goose_pub_button = self.findChild(QPushButton, 'real_goose_pub_button')
+        self.real_goose_sub_button = self.findChild(QPushButton, 'real_goose_sub_button')
+        self.easyediter_button = self.findChild(QPushButton, 'easyediter_button')
+        if self.upload_file_button:
+            self.upload_file_button.clicked.connect(self.load_uploadfile_ui)
+        if self.real_goose_pub_button:
+            self.real_goose_pub_button.clicked.connect(self.goose_pub_ui)
+        if self.real_goose_sub_button:
+            self.real_goose_sub_button.clicked.connect(self.goose_sub_ui)
+        if self.easyediter_button:
+            self.easyediter_button.clicked.connect(self.load_easyediter_ui)
 
     def goose_pub_ui(self):
         self.clear_layout()
