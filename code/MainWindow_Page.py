@@ -13,6 +13,23 @@ from Sniffer_Page import GOOSESnifferWindow
 from Login_Page import LoginPage
 from EasyEditer_Page import EasyEditorWidget
 from resource_helper import get_ui_path, get_icon_path
+# Fix for PyInstaller sys.stderr issue
+if sys.stderr is None:
+    sys.stderr = open(os.devnull, 'w')
+if sys.stdout is None:
+    sys.stdout = open(os.devnull, 'w')
+
+# เพิ่ม exception handler
+import traceback
+def handle_exception(exc_type, exc_value, exc_traceback):
+    if issubclass(exc_type, KeyboardInterrupt):
+        sys.__excepthook__(exc_type, exc_value, exc_traceback)
+        return
+    
+    print("Uncaught exception:", exc_type, exc_value)
+    traceback.print_exception(exc_type, exc_value, exc_traceback)
+
+sys.excepthook = handle_exception
 
 class MyApp(QMainWindow):
     def __init__(self):

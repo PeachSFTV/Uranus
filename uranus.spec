@@ -96,17 +96,16 @@ exe = EXE(
     a.datas,
     [],
     name='Uranus',
-    debug=False,
+    debug=True,  # เปิด debug mode
     bootloader_ignore_signals=False,
     strip=False,
-    upx=True,  # Compress executable
+    upx=False,  # ปิด UPX compression
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=False,  # GUI mode - ไม่แสดง console
+    console=True,  # เปลี่ยนเป็น True เพื่อ debug
     disable_windowed_traceback=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='icon/UranusIcon.ico',  # Icon path
-    version='version_info.txt'  # Optional version info
+    icon='icon/UranusIcon.ico',
 )
