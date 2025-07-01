@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>VirtualIEDWidget</class>
+ <widget class="QWidget" name="VirtualIEDWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1200</width>
+    <height>800</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Virtual IED System - GOOSE Publisher for Commissioning</string>
+  </property>
+  
+  <!-- SCL File Section -->
+  <widget class="QListWidget" name="fileslist_show">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>50</y>
+     <width>350</width>
+     <height>120</height>
+    </rect>
+   </property>
+  </widget>
+  
+  <widget class="QPushButton" name="fileslist_button">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>10</y>
+     <width>150</width>
+     <height>35</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>📋 Load SCL Files</string>
+   </property>
+  </widget>
+  
+  <!-- IED Tree View -->
+  <widget class="QTreeWidget" name="ied_tree">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>210</y>
+     <width>350</width>
+     <height>450</height>
+    </rect>
+   </property>
+   <column>
+    <property name="text">
+     <string>Element</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Value</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Type</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Path</string>
+    </property>
+   </column>
+  </widget>
+  
+  <widget class="QLabel" name="view_mode_label">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>180</y>
+     <width>100</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>📊 Dataset View:</string>
+   </property>
+  </widget>
+  
+  <!-- Quick Actions -->
+  <widget class="QGroupBox" name="quick_actions_group">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>670</y>
+     <width>350</width>
+     <height>60</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>⚡ Virtual IED Actions</string>
+   </property>
+  </widget>
+  
+  <widget class="QPushButton" name="export_data_btn">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>695</y>
+     <width>100</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>💾 Export Data</string>
+   </property>
+  </widget>
+  
+  <widget class="QPushButton" name="edit_addr_btn">
+   <property name="geometry">
+    <rect>
+     <x>140</x>
+     <y>695</y>
+     <width>100</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>🔧 Edit Config</string>
+   </property>
+  </widget>
+  
+  <widget class="QPushButton" name="monitor_goose_btn">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>695</y>
+     <width>110</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>📡 Monitor First</string>
+   </property>
+  </widget>
+  
+  <!-- Control Section -->
+  <widget class="QGroupBox" name="control_group">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>10</y>
+     <width>790</width>
+     <height>160</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>🎮 Virtual IED Control - Commissioning Mode</string>
+   </property>
+  </widget>
+  
+  <widget class="QLabel" name="interface_label">
+   <property name="geometry">
+    <rect>
+     <x>405</x>
+     <y>40</y>
+     <width>70</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>🌐 Interface:</string>
+   </property>
+  </widget>
+  
+  <widget class="QComboBox" name="network_interface_combo">
+   <property name="geometry">
+    <rect>
+     <x>480</x>
+     <y>40</y>
+     <width>120</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  
+  <widget class="QCheckBox" name="test_mode_checkbox">
+   <property name="geometry">
+    <rect>
+     <x>620</x>
+     <y>40</y>
+     <width>150</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>🧪 Test Mode (Safe)</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </widget>
+  
+  <widget class="QPushButton" name="start_system_btn">
+   <property name="geometry">
+    <rect>
+     <x>405</x>
+     <y>75</y>
+     <width>200</width>
+     <height>35</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>🚀 Start Virtual IED</string>
+   </property>
+  </widget>
+  
+  <widget class="QPushButton" name="stop_system_btn">
+   <property name="geometry">
+    <rect>
+     <x>615</x>
+     <y>75</y>
+     <width>150</width>
+     <height>35</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>🛑 Stop System</string>
+   </property>
+  </widget>
+  
+  <widget class="QLabel" name="time_sync_status">
+   <property name="geometry">
+    <rect>
+     <x>405</x>
+     <y>115</y>
+     <width>360</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>⏰ Time Sync: Checking...</string>
+   </property>
+  </widget>
+  
+  <widget class="QPlainTextEdit" name="system_status_text">
+   <property name="geometry">
+    <rect>
+     <x>405</x>
+     <y>135</y>
+     <width>360</width>
+     <height>30</height>
+    </rect>
+   </property>
+  </widget>
+  
+  <widget class="QPushButton" name="back_button">
+   <property name="geometry">
+    <rect>
+     <x>775</x>
+     <y>120</y>
+     <width>80</width>
+     <height>35</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>❌ EXIT</string>
+   </property>
+  </widget>
+  
+  <!-- Log Section -->
+  <widget class="QTabWidget" name="logs_tab_widget">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>180</y>
+     <width>790</width>
+     <height>550</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>0</number>
+   </property>
+   <widget class="QWidget" name="virtual_log_tab">
+    <attribute name="title">
+     <string>🤖 Virtual IED Log</string>
+    </attribute>
+   </widget>
+   <widget class="QWidget" name="goose_log_tab">
+    <attribute name="title">
+     <string>📡 GOOSE Multicast</string>
+    </attribute>
+   </widget>
+  </widget>
+  
+  <widget class="QPlainTextEdit" name="pub_log">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>210</y>
+     <width>770</width>
+     <height>510</height>
+    </rect>
+   </property>
+  </widget>
+  
+  <widget class="QPlainTextEdit" name="sub_log">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>210</y>
+     <width>770</width>
+     <height>510</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+  </widget>
+  
+  <widget class="QPushButton" name="clear_mms_log_btn">
+   <property name="geometry">
+    <rect>
+     <x>1020</x>
+     <y>180</y>
+     <width>70</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>🗑️ Clear</string>
+   </property>
+  </widget>
+  
+  <widget class="QPushButton" name="save_mms_log_btn">
+   <property name="geometry">
+    <rect>
+     <x>1100</x>
+     <y>180</y>
+     <width>70</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>💾 Save</string>
+   </property>
+  </widget>
+  
+  <widget class="QPushButton" name="clear_goose_log_btn">
+   <property name="geometry">
+    <rect>
+     <x>1020</x>
+     <y>180</y>
+     <width>70</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>🗑️ Clear</string>
+   </property>
+  </widget>
+  
+  <widget class="QPushButton" name="save_goose_log_btn">
+   <property name="geometry">
+    <rect>
+     <x>1100</x>
+     <y>180</y>
+     <width>70</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>💾 Save</string>
+   </property>
+  </widget>
+  
+  <!-- Not needed widgets removed - keeping as hidden for compatibility -->
+  <widget class="QCheckBox" name="external_goose_checkbox">
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

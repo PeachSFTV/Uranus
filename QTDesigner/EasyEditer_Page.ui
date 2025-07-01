@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>EasyEditorWidget</class>
+ <widget class="QWidget" name="EasyEditorWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1200</width>
+    <height>800</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>SCL Logical Node Editor</string>
+  </property>
+  
+  <!-- Top Control Bar -->
+  <widget class="QPushButton" name="backBtn">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>20</y>
+     <width>80</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>⬅️ Back</string>
+   </property>
+  </widget>
+  
+  <widget class="QPushButton" name="connectBtn">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>20</y>
+     <width>100</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>🔌 Connect</string>
+   </property>
+  </widget>
+  
+  <widget class="QPushButton" name="monitorBtn">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>20</y>
+     <width>100</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>▶️ Monitor</string>
+   </property>
+  </widget>
+  
+  <widget class="QLabel" name="connectionStatus">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>20</y>
+     <width>150</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>🔴 Disconnected</string>
+   </property>
+  </widget>
+  
+  <widget class="QCheckBox" name="safetyMode">
+   <property name="geometry">
+    <rect>
+     <x>510</x>
+     <y>25</y>
+     <width>120</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>🛡️ Safety Mode</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </widget>
+  
+  <widget class="QCheckBox" name="testMode">
+   <property name="geometry">
+    <rect>
+     <x>650</x>
+     <y>25</y>
+     <width>100</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>🧪 Test Mode</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </widget>
+  
+  <!-- Main Content Area -->
+  <widget class="QSplitter" name="mainSplitter">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>80</y>
+     <width>1180</width>
+     <height>710</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   
+   <!-- Left Panel -->
+   <widget class="QWidget" name="leftPanel">
+    <property name="maximumSize">
+     <size>
+      <width>400</width>
+      <height>16777215</height>
+     </size>
+    </property>
+    
+    <widget class="QGroupBox" name="filesGroup">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>360</width>
+       <height>120</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>📁 SCL Files</string>
+     </property>
+     
+     <widget class="QPushButton" name="loadFilesBtn">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>120</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>📋 Browse Files</string>
+      </property>
+     </widget>
+     
+     <widget class="QListWidget" name="filesListShow">
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>20</y>
+        <width>210</width>
+        <height>90</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+    
+    <!-- IED Selection -->
+    <widget class="QGroupBox" name="iedGroup">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>140</y>
+       <width>360</width>
+       <height>80</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>🏭 IED Selection</string>
+     </property>
+     
+     <widget class="QLabel" name="iedLabel">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>80</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Select IED:</string>
+      </property>
+     </widget>
+     
+     <widget class="QComboBox" name="iedCombo">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>45</y>
+        <width>340</width>
+        <height>25</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+    
+    <!-- Filters -->
+    <widget class="QGroupBox" name="filtersGroup">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>230</y>
+       <width>360</width>
+       <height>100</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>🔍 Filters</string>
+     </property>
+     
+     <widget class="QLabel" name="categoryLabel">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>60</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Category:</string>
+      </property>
+     </widget>
+     
+     <widget class="QComboBox" name="categoryCombo">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>20</y>
+        <width>270</width>
+        <height>25</height>
+       </rect>
+      </property>
+     </widget>
+     
+     <widget class="QLabel" name="searchLabel">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>50</y>
+        <width>60</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Search:</string>
+      </property>
+     </widget>
+     
+     <widget class="QLineEdit" name="searchBox">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>50</y>
+        <width>270</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="placeholderText">
+       <string>Type to search LN...</string>
+      </property>
+     </widget>
+    </widget>
+    
+    <!-- Logical Nodes List -->
+    <widget class="QLabel" name="listLabel">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>340</y>
+       <width>200</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>📋 Available Logical Nodes:</string>
+     </property>
+    </widget>
+    
+    <widget class="QListWidget" name="lnList">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>365</y>
+       <width>340</width>
+       <height>320</height>
+      </rect>
+     </property>
+    </widget>
+   </widget>
+   
+   <!-- Right Panel -->
+   <widget class="QWidget" name="rightPanel">
+    <widget class="QLabel" name="instructionLabel">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>10</y>
+       <width>600</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>🎯 Drag logical nodes from the left panel and drop them here to configure.</string>
+     </property>
+    </widget>
+    
+    <widget class="QScrollArea" name="dropZone">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>45</y>
+       <width>750</width>
+       <height>640</height>
+      </rect>
+     </property>
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <property name="acceptDrops">
+      <bool>true</bool>
+     </property>
+     <property name="styleSheet">
+      <string>QScrollArea {
+    background-color: #fafafa;
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+}
+QScrollArea:hover {
+    border-color: #4CAF50;
+    background-color: #f0fff0;
+}</string>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>748</width>
+        <height>638</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

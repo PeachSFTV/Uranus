@@ -1,0 +1,56 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Virtual environment
+venv/
+.venv/
+env/
+.env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git submodules and external repos
+code/libiec61850/
+
+# Temporary and backup files
+*.tmp
+*.temp
+*.log
+*.backup
+*.autosave.backup*
+*.temp.*
+*.bak
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# SCL processing temp files
+upload_file/after_convert/**/*.backup*
+upload_file/after_convert/**/*.autosave.backup*
+upload_file/after_convert/**/*.temp*
+upload_file/before_convert/*.bak
+
+# Requirements in wrong location
+code/requirements.txt
