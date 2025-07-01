@@ -32,7 +32,9 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install pyinstaller
-        pip install PyQt6 PyQt6-Qt6 PyQt6-sip  # เพิ่มบรรทัดนี้
+        pip install PyQt6 PyQt6-Qt6 PyQt6-sip
+        # Try to install pyiec61850, continue if fails
+        pip install pyiec61850 || echo "pyiec61850 not available, continuing..."
         pip install -r requirements.txt
         
     - name: Verify project structure

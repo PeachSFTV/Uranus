@@ -22,6 +22,7 @@ hiddenimports = [
     'PyQt6.QtGui', 
     'PyQt6.QtWidgets',
     'PyQt6.uic',
+    'pyiec61850',
     'PyQt6.uic.load_ui',
     'PyQt6.uic.uiparser',
     

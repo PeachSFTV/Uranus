@@ -19,6 +19,23 @@ from typing import List, Dict, Any, Optional, Callable, Tuple
 from enum import IntEnum
 from dataclasses import dataclass
 import json
+from PyQt6.QtCore import QObject, pyqtSignal
+
+PYIEC61850_AVAILABLE = False
+try:
+    import pyiec61850 as iec61850
+    PYIEC61850_AVAILABLE = True
+    print("✅ pyiec61850 loaded successfully")
+except ImportError:
+    print("⚠️ pyiec61850 not available - using fallback mode")
+    # Create dummy iec61850 module
+    class DummyIEC61850:
+        def __init__(self):
+            pass
+        def __getattr__(self, name):
+            return lambda *args, **kwargs: None
+    
+    iec61850 = DummyIEC61850()
 
 # Import time sync utilities
 try:
